@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Calculadora Dolical</title>
+
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0b5fff">
+
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+    body { margin: 0; background: #f5f7fb; }
+    .wrap { max-width: 520px; margin: 0 auto; padding: 16px; }
+    .card { background: white; border-radius: 16px; padding: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.06); }
+    h1 { font-size: 20px; margin: 0 0 12px; }
+    h2 { font-size: 14px; margin: 18px 0 10px; color: #1f2a37; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    label { font-size: 12px; color: #4b5563; display: block; margin-bottom: 6px; }
+    .row { display: grid; grid-template-columns: 1fr 140px; gap: 10px; align-items: end; }
+    input {
+      width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 12px;
+      font-size: 16px; outline: none;
+    }
+    input:focus { border-color: #0b5fff; box-shadow: 0 0 0 3px rgba(11,95,255,.15); }
+    .unit { font-size: 12px; color: #6b7280; padding-bottom: 10px; }
+    .result {
+      background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 14px; padding: 12px; margin-top: 10px;
+    }
+    .result .big { font-size: 28px; font-weight: 800; color: #065f46; line-height: 1.1; }
+    .result .small { font-size: 12px; color: #065f46; opacity: .9; }
+    .muted { font-size: 12px; color: #6b7280; margin-top: 10px; }
+    .btns { display: flex; gap: 10px; margin-top: 14px; }
+    button {
+      border: 0; padding: 12px 14px; border-radius: 12px; font-size: 14px; font-weight: 700;
+      cursor: pointer;
+    }
+    .primary { background: #0b5fff; color: white; }
+    .ghost { background: #eef2ff; color: #1e3a8a; }
+    .warn { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; border-radius: 12px; padding: 10px; margin-top: 10px; display:none; }
+    footer { text-align: center; margin: 14px 0 4px; font-size: 12px; color:#6b7280; }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Calculadora de dosis (Dolical)</h1>
+
+      <h2>Datos de entrada</h2>
+
+      <div class="grid">
+        <div class="row">
+          <div>
+            <label for="volL">Volumen de agua</label>
+            <input id="volL" inputmode="decimal" placeholder="Ej: 150" />
+          </div>
+          <div class="unit">L</div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="dose">Dosis recomendada</label>
+            <input id="dose" inputmode="decimal" placeholder="Ej: 90" />
+          </div>
+          <div class="unit">g/m³</div>
+        </div>
+
+        <h2>Solución madre</h2>
+
+        <div class="row">
+          <div>
+            <label for="gStock">Gramos de Dolical en solución madre</label>
+            <input id="gStock" inputmode="decimal" placeholder="Ej: 80" />
+          </div>
+          <div class="unit">g</div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="lStock">Volumen de la solución madre</label>
+            <input id="lStock" inputmode="decimal" placeholder="Ej: 1" />
+          </div>
+          <div class="unit">L</div>
+        </div>
+
+        <div id="warn" class="warn">
+          Revisa los datos: no se permiten ceros ni valores vacíos.
+        </div>
+
+        <h2>Resultados</h2>
+
+        <div class="result">
+          <div class="small">Gramos totales a usar</div>
+          <div class="big"><span id="gNeed">—</span> g</div>
+        </div>
+
+        <div class="result">
+          <div class="small">Concentración solución madre</div>
+          <div class="big"><span id="conc">—</span> g/L</div>
+        </div>
+
+        <div class="result">
+          <div class="small">Volumen de solución a usar</div>
+          <div class="big"><span id="mlNeed">—</span> mL</div>
+        </div>
+
+        <div class="btns">
+          <button class="primary" id="calc">Calcular</button>
+          <button class="ghost" id="clear">Limpiar</button>
+        </div>
+
+        <div class="muted">
+          Fórmulas: gramos = (L/1000) × dosis(g/m³). Concentración = g/L. mL = (gramos / concentración) × 1000.
+        </div>
+      </div>
+    </div>
+
+    <footer>Versión PWA (offline) • Uso interno</footer>
+  </div>
+
+  <script>
+    // Registro de Service Worker (offline)
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
+    }
+
+    const $ = (id) => document.getElementById(id);
+
+    function toNumber(v) {
+      // Permite coma o punto decimal
+      if (typeof v !== "string") return NaN;
+      const cleaned = v.replace(",", ".").trim();
+      return cleaned === "" ? NaN : Number(cleaned);
+    }
+
+    function fmt(n, decimals=2) {
+      if (!Number.isFinite(n)) return "—";
+      return n.toFixed(decimals).replace(".", ",");
+    }
+
+    function calc() {
+      const volL  = toNumber($("volL").value);
+      const dose  = toNumber($("dose").value);   // g/m3
+      const gStock= toNumber($("gStock").value); // g
+      const lStock= toNumber($("lStock").value); // L
+
+      const warn = $("warn");
+      warn.style.display = "none";
+
+      // Validación
+      if (![volL, dose, gStock, lStock].every(Number.isFinite) || volL <= 0 || dose <= 0 || gStock <= 0 || lStock <= 0) {
+        warn.style.display = "block";
+        $("gNeed").textContent = "—";
+        $("conc").textContent = "—";
+        $("mlNeed").textContent = "—";
+        return;
+      }
+
+      // 1) Gramos necesarios
+      const gNeed = (volL / 1000) * dose;
+
+      // 2) Concentración solución madre
+      const conc = gStock / lStock; // g/L
+
+      // 3) mL a usar
+      const mlNeed = (gNeed / conc) * 1000;
+
+      $("gNeed").textContent = fmt(gNeed, 2);
+      $("conc").textContent = fmt(conc, 2);
+      $("mlNeed").textContent = fmt(mlNeed, 0); // mL redondeado
+    }
+
+    $("calc").addEventListener("click", calc);
+
+    $("clear").addEventListener("click", () => {
+      ["volL","dose","gStock","lStock"].forEach(id => $(id).value = "");
+      $("warn").style.display = "none";
+      $("gNeed").textContent = "—";
+      $("conc").textContent = "—";
+      $("mlNeed").textContent = "—";
+    });
+  </script>
+</body>
+</html>
