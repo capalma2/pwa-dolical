@@ -1,9 +1,9 @@
 {
-  "name": "Calculadora Dolical",
+  "name": "Calculadora Dosis Dolical",
   "short_name": "Dolical",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f5f7fb",
+  "background_color": "#0b5fff",
   "theme_color": "#0b5fff",
   "icons": [
     {
@@ -18,3 +18,4 @@
     }
   ]
 }
+
