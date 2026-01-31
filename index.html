@@ -115,68 +115,66 @@
   </div>
 
   <script>
-    // Registro de Service Worker (offline)
-    if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
-    }
+  // Registro de Service Worker (offline)
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => navigator.serviceWorker.register("sw.js"));
+  }
 
-    const $ = (id) => document.getElementById(id);
+  const $ = (id) => document.getElementById(id);
 
-    function toNumber(v) {
-      // Permite coma o punto decimal
-      if (typeof v !== "string") return NaN;
-      const cleaned = v.replace(",", ".").trim();
-      return cleaned === "" ? NaN : Number(cleaned);
-    }
+  function toNumber(v) {
+    // Permite coma o punto decimal
+    if (typeof v !== "string") return NaN;
+    const cleaned = v.replace(",", ".").trim();
+    return cleaned === "" ? NaN : Number(cleaned);
+  }
 
-    function fmt(n, decimals=2) {
-      if (!Number.isFinite(n)) return "—";
-      return n.toFixed(decimals).replace(".", ",");
-    }
+  function fmt(n, decimals = 2) {
+    if (!Number.isFinite(n)) return "—";
+    return n.toFixed(decimals).replace(".", ",");
+  }
 
-    function calc() {
-      const volL  = toNumber($("volL").value);
-      const dose  = toNumber($("dose").value);   // g/m3
-      const gStock= toNumber($("gStock").value); // g
-      const lStock= toNumber($("lStock").value); // L
+  function calc() {
+    const volL   = toNumber($("volL").value);
+    const dose   = toNumber($("dose").value);   // g/m3
+    const gStock = toNumber($("gStock").value); // g
+    const lStock = toNumber($("lStock").value); // L
 
-      const warn = $("warn");
-      warn.style.display = "none";
+    const warn = $("warn");
+    warn.style.display = "none";
 
-      // Validación
-      if (![volL, dose, gStock, lStock].every(Number.isFinite) || volL <= 0 || dose <= 0 || gStock <= 0 || lStock <= 0) {
-        warn.style.display = "block";
-        $("gNeed").textContent = "—";
-        $("conc").textContent = "—";
-        $("mlNeed").textContent = "—";
-        return;
-      }
-
-      // 1) Gramos necesarios
-      const gNeed = (volL / 1000) * dose;
-
-      // 2) Concentración solución madre
-      const conc = gStock / lStock; // g/L
-
-      // 3) mL a usar
-      const mlNeed = (gNeed / conc) * 1000;
-
-      $("gNeed").textContent = fmt(gNeed, 2);
-      $("conc").textContent = fmt(conc, 2);
-      $("mlNeed").textContent = fmt(mlNeed, 0); // mL redondeado
-    }
-
-    $("calc").addEventListener("click", calc);
-
-    $("clear").addEventListener("click", () => {
-      ["volL","dose","gStock","lStock"].forEach(id => $(id).value = "");
-      $("warn").style.display = "none";
+    // Validación
+    if (![volL, dose, gStock, lStock].every(Number.isFinite) || volL <= 0 || dose <= 0 || gStock <= 0 || lStock <= 0) {
+      warn.style.display = "block";
       $("gNeed").textContent = "—";
-      $("conc").textContent = "—";
       $("mlNeed").textContent = "—";
-    });
-  </script>
+      return;
+    }
+
+    // 1) Gramos necesarios
+    const gNeed = (volL / 1000) * dose;
+
+    // 2) Concentración solución madre (se calcula pero NO se muestra)
+    const conc = gStock / lStock; // g/L
+
+    // 3) mL a usar
+    const mlNeed = (gNeed / conc) * 1000;
+
+    $("gNeed").textContent = fmt(gNeed, 2);
+    $("mlNeed").textContent = fmt(mlNeed, 0); // mL redondeado
+  }
+
+  $("calc").addEventListener("click", calc);
+
+  $("clear").addEventListener("click", () => {
+    ["volL", "dose", "gStock", "lStock"].forEach(id => $(id).value = "");
+    $("warn").style.display = "none";
+    $("gNeed").textContent = "—";
+    $("mlNeed").textContent = "—";
+  });
+</script>
 </body>
 </html>
+
 
 
