@@ -18,12 +18,12 @@
 .wrap::before {
   content: "";
   display: block;
-  height: 110px;                 /* altura del banner */
+  height: 80px;                 /* ⬇️ logo más pequeño */
   background-image: url("logo.aquagen.png");
   background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;      /* 👈 CLAVE */
-  margin-bottom: -70px;
+  background-position: center top; /* ⬆️ más arriba */
+  background-size: 120px auto;      /* ⬇️ tamaño del logo */
+  margin-bottom: -60px;             /* ⬆️ menos invasión del recuadro */
 }
     .wrap { max-width: 520px; margin: 0 auto; padding: 16px; }
     .card { background: white; border-radius: 16px; padding: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.06); }
@@ -66,6 +66,15 @@
   font-weight: 800;
   color: #065f46;
   margin: 6px 0;
+  font-size: 14px;
+}
+    .note-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+.note-icon .icon {
   font-size: 14px;
 }
   </style>
@@ -131,8 +140,9 @@
   <div class="big"><span id="mlNeed">—</span> mL</div>
 </div>
 
-<div class="note">
-  Utilice <strong>solo una</strong> de las dos opciones.
+<div class="note note-icon">
+  <span class="icon">⚠️</span>
+  <span>Utilice <strong>solo una</strong> de las dos opciones.</span>
 </div>
 
         <div class="btns">
@@ -210,6 +220,7 @@
 </script>
 </body>
 </html>
+
 
 
 
