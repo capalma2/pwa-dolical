@@ -45,6 +45,15 @@
     color: #065f46;
     margin-top: 6px;
   }
+    .or {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 800;
+  color: #065f46;
+  margin: 6px 0;
+  font-size: 14px;
+}
   </style>
 </head>
 
@@ -84,7 +93,7 @@
 
         <div class="row">
           <div>
-            <label for="lStock">Volumen de la solución madre</label>
+            <label for="lStock">Volumen para la solución madre</label>
             <input id="lStock" inputmode="decimal" placeholder="Ej: 1" />
           </div>
           <div class="unit">L</div>
@@ -94,17 +103,17 @@
           Revisa los datos: no se permiten ceros ni valores vacíos.
         </div>
 
-        <h2>Modo de empleo</h2>
+        <h2>Opciones de aplicación del anestésico</h2>
 
 <div class="result">
-  <div class="small">Polvo (gramos de producto)</div>
+  <div class="small">Forma sólida (polvo): dosificación expresada en gramos</div>
   <div class="big"><span id="gNeed">—</span> g</div>
 </div>
 
 <div class="or">O</div>
 
 <div class="result">
-  <div class="small">Líquido (volumen de solución preparada)</div>
+  <div class="small">Forma líquida: dosificación expresada en volumen de solución preparada</div>
   <div class="big"><span id="mlNeed">—</span> mL</div>
 </div>
 
@@ -187,6 +196,7 @@
 </script>
 </body>
 </html>
+
 
 
 
