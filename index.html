@@ -210,7 +210,11 @@
   }
 
   $("calc").addEventListener("click", calc);
-
+["volL", "dose", "gStock", "lStock"].forEach((id) => {
+  const el = $(id);
+  el.addEventListener("input", calc);   // calcula mientras escribes
+  el.addEventListener("change", calc);  // asegura cálculo al salir del campo
+});
   $("clear").addEventListener("click", () => {
     ["volL", "dose", "gStock", "lStock"].forEach(id => $(id).value = "");
     $("warn").style.display = "none";
@@ -220,6 +224,7 @@
 </script>
 </body>
 </html>
+
 
 
 
