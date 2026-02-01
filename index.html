@@ -12,15 +12,18 @@
     :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
     body {
   margin: 0;
-  background:
-    linear-gradient(
-      rgba(245,247,251,0.92),
-      rgba(245,247,251,0.92)
-    ),
-    url("logo.aquagen.png");
-  background-size: cover;
+  background: #f5f7fb;
+}
+
+.wrap::before {
+  content: "";
+  display: block;
+  height: 110px;                 /* altura del banner */
+  background-image: url("logo.aquagen.png");
+  background-repeat: no-repeat;
   background-position: center;
-  background-attachment: fixed;
+  background-size: contain;      /* 👈 CLAVE */
+  margin-bottom: -70px;
 }
     .wrap { max-width: 520px; margin: 0 auto; padding: 16px; }
     .card { background: white; border-radius: 16px; padding: 16px; box-shadow: 0 6px 20px rgba(0,0,0,.06); }
@@ -207,6 +210,7 @@
 </script>
 </body>
 </html>
+
 
 
 
